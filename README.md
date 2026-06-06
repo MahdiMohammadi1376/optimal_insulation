@@ -4,6 +4,10 @@ A multi-objective optimization framework for determining optimal insulation thic
 
 ---
 
+## Demo
+
+![demo](pareto1.png)
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
@@ -278,6 +282,6 @@ Install all with:
 
 ```bash
 pip install -r requirements.txt
-````
+```
 
 ---
