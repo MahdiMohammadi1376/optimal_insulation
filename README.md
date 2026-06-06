@@ -17,8 +17,6 @@ A multi-objective optimization framework for determining optimal insulation thic
 - [Optimization Algorithm](#optimization-algorithm)
 - [Assumptions](#assumptions)
 - [Dependencies](#dependencies)
-- [Citation](#citation)
-- [License](#license)
 
 ---
 
@@ -109,8 +107,6 @@ insulation-optimizer/
 └── notebooks/
     └── exploration.ipynb    # Optional: demo and result visualization
 ```
-
-> **Note:** The `models/` directory is excluded from version control due to file size. See [ANN Models](#ann-models) for download or training instructions.
 
 ---
 
@@ -278,7 +274,6 @@ NSGA-II (Non-dominated Sorting Genetic Algorithm II) is used via the [pymoo](htt
 
 ## Dependencies
 
-````
 Install all with:
 
 ```bash
