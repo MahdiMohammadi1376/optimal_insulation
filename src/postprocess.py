@@ -1,12 +1,3 @@
-"""
-postprocess.py
---------------
-Everything that happens after NSGA-II finishes:
-  - Knee-point selection
-  - Pareto front plot  (color-coded by material)
-  - CSV and text exports
-"""
-
 import os
 import numpy as np
 import pandas as pd
@@ -14,37 +5,20 @@ import matplotlib.pyplot as plt
 
 from src.config import MATERIALS, RESULT_DIR
 
-
-# ---------------------------------------------------------------------------
 # Knee point
-# ---------------------------------------------------------------------------
 def find_knee_point(F: np.ndarray) -> int:
-    """
-    Return the index of the knee point in the Pareto front F.
-    Uses the minimum-distance-to-origin heuristic in normalised objective space.
-    """
     F_min = np.min(F, axis=0)
     F_max = np.max(F, axis=0)
     F_norm = (F - F_min) / (F_max - F_min + 1e-10)
     distances = np.linalg.norm(F_norm, axis=1)
     return int(np.argmin(distances))
 
-
-# ---------------------------------------------------------------------------
 # Export
-# ---------------------------------------------------------------------------
 def save_results(
     res,
     material_choice: int,
     knee_idx: int,
 ) -> str:
-    """
-    Save the Pareto front to CSV and the knee-point summary to a text file.
-
-    Returns
-    -------
-    Path to the saved CSV file.
-    """
     os.makedirs(RESULT_DIR, exist_ok=True)
     loads = res.opt.get("loads")
 
@@ -87,10 +61,7 @@ def save_results(
 
     return csv_path
 
-
-# ---------------------------------------------------------------------------
 # Plot
-# ---------------------------------------------------------------------------
 def plot_pareto(res, material_choice: int, knee_idx: int, hv_value: float) -> None:
     """
     Draw and save the Pareto front scatter plot, colour-coded by material.

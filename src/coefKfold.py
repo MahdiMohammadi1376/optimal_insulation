@@ -193,5 +193,5 @@ plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.show()
 
-model.save('coefKfold10.h5')
+#model.save('coefKfold10.h5')
 #joblib.dump(scaler, 'scaler_convertor.pkl')
