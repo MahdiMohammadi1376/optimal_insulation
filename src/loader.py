@@ -1,10 +1,3 @@
-"""
-loader.py
----------
-Loads the three ANN models and their scalers from disk, then computes the
-cooling and heating conversion coefficients for the user's building geometry.
-"""
-
 import joblib
 import numpy as np
 import warnings
@@ -20,10 +13,7 @@ from src.config import (
 warnings.filterwarnings("ignore", message="X does not have valid feature names", category=UserWarning)
 warnings.filterwarnings("ignore", message="1/1", category=UserWarning)
 
-
-# ---------------------------------------------------------------------------
-# Custom regularizer (must match the one used during training)
-# ---------------------------------------------------------------------------
+# Custom regularizer
 class CustomRegularizer(Regularizer):
     """L2 regularizer that penalises all features except the first (R_wall)."""
 
@@ -37,22 +27,8 @@ class CustomRegularizer(Regularizer):
     def get_config(self) -> dict:
         return {"strength": self.strength}
 
-
-# ---------------------------------------------------------------------------
 # Public API
-# ---------------------------------------------------------------------------
 def load_all_models():
-    """
-    Load and return all three ANN models together with their scalers.
-
-    Returns
-    -------
-    heat_model : keras.Model
-    cool_model : keras.Model
-    convertor  : keras.Model
-    scaler_thermal   : sklearn scaler
-    scaler_convertor : sklearn scaler
-    """
     custom_objs = {"CustomRegularizer": CustomRegularizer}
 
     scaler_thermal   = joblib.load(SCALER_THERMAL_FILE)
@@ -63,7 +39,6 @@ def load_all_models():
 
     return heat_model, cool_model, convertor, scaler_thermal, scaler_convertor
 
-
 def compute_coefficients(
     A1: float,
     A2: float,
@@ -71,23 +46,7 @@ def compute_coefficients(
     convertor,
     scaler_convertor,
 ) -> tuple[float, float]:
-    """
-    Compute the scaling coefficients that convert reference-geometry loads
-    to the user's actual building dimensions.
-
-    Parameters
-    ----------
-    A1 : gross floor area (m²)
-    A2 : external wall area (m²)
-    A6 : window-to-wall ratio
-    convertor        : trained converter Keras model
-    scaler_convertor : fitted sklearn scaler for the converter
-
-    Returns
-    -------
-    cool_coef : float
-    heat_coef : float
-    """
+  
     a = np.array([[A1 / 730, A2 / 910, A6, 1]])
     b = np.array([[A1 / 730, A2 / 910, A6, 2]])
 
