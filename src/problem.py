@@ -1,14 +1,6 @@
-"""
-problem.py
-----------
-pymoo Problem subclass that wraps evaluate_solution() for use with NSGA-2.
-"""
-
 import numpy as np
 from pymoo.core.problem import Problem
-
 from src.evaluate import evaluate_solution
-
 
 class InsulationProblem(Problem):
     """
@@ -44,7 +36,6 @@ class InsulationProblem(Problem):
 
         super().__init__(n_var=n_var, n_obj=2, xl=xl, xu=xu)
 
-    # ------------------------------------------------------------------
     def _evaluate(self, X: np.ndarray, out: dict, *args, **kwargs):
         objectives = []
         loads_list = []
