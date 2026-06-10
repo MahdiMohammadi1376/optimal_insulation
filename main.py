@@ -1,12 +1,3 @@
-"""
-main.py
--------
-Entry point for the Building Insulation Optimizer.
-
-Run:
-    python main.py
-"""
-
 import sys
 import warnings
 import numpy as np
@@ -30,9 +21,7 @@ from src.postprocess import find_knee_point, save_results, plot_pareto
 import os
 os.makedirs(RESULT_DIR, exist_ok=True)
 
-# ---------------------------------------------------------------------------
 # User prompts
-# ---------------------------------------------------------------------------
 sys.stdout.reconfigure(encoding="utf-8")
 
 print("""
@@ -85,25 +74,19 @@ material_choice = int(input(
     "Optimise for: 1=Rock Wool  2=XPS  3=EPS  4=Glass Wool  0=All  → "
 ))
 
-# ---------------------------------------------------------------------------
-# Derived geometry  (reference building: 730 m² floor, 910 m² wall)
-# ---------------------------------------------------------------------------
+# Derived geometry  (reference building: 730 m2 floor, 910 m2 wall)
 A4  = 910 * A6          # reference window area
 A5  = 910 - A4          # reference wall area (no windows)
 A44 = A2  * A6          # user window area
 A55 = A2  - A44         # user opaque wall area
 
-# ---------------------------------------------------------------------------
 # Load models & compute coefficients
-# ---------------------------------------------------------------------------
 print("\nLoading ANN models …")
 heat_model, cool_model, convertor, scaler_thermal, scaler_convertor = load_all_models()
 cool_coef, heat_coef = compute_coefficients(A1, A2, A6, convertor, scaler_convertor)
 print(f"  cool_coef = {cool_coef:.4f}   heat_coef = {heat_coef:.4f}")
 
-# ---------------------------------------------------------------------------
 # Shared keyword arguments for evaluate_solution
-# ---------------------------------------------------------------------------
 cache = load_cache()
 
 eval_kwargs = dict(
@@ -129,9 +112,7 @@ eval_kwargs = dict(
     cache                      = cache,
 )
 
-# ---------------------------------------------------------------------------
 # Run NSGA-II
-# ---------------------------------------------------------------------------
 print("\nRunning NSGA-II optimisation …")
 np.random.seed(RANDOM_SEED)
 
@@ -144,9 +125,7 @@ termination = DefaultMultiObjectiveTermination(
 res = minimize(problem, algorithm, termination, seed=RANDOM_SEED, verbose=True)
 save_cache(cache)
 
-# ---------------------------------------------------------------------------
 # Post-processing
-# ---------------------------------------------------------------------------
 hv_value  = Hypervolume(ref_point=REF_POINT).do(res.F)
 knee_idx  = find_knee_point(res.F)
 knee_F    = res.F[knee_idx]
