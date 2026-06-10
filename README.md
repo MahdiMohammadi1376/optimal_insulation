@@ -6,7 +6,7 @@ A multi-objective optimization framework for determining optimal insulation thic
 
 ## Demo
 
-![demo](pareto1.png)
+![demo](demo2.gif)
 
 ## 📋 Table of Contents
 
