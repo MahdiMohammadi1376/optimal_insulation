@@ -45,11 +45,7 @@ y = df['Cooling']
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, test_size=0.2, train_size=0.8, random_state=15)
 
-# ----------------- K-Fold cross-validation on training set -----------------
-# Minimal changes: perform 5-fold CV on x_train/y_train, fit scaler inside each fold,
-# train same model architecture in each fold, report MAE/RMSE/R2 per fold,
-# then retrain final model on full training set and proceed as before.
-
+# K-Fold cross-validation on training set
 kf = KFold(n_splits=5, shuffle=True, random_state=15)
 
 cv_mae = []
@@ -70,7 +66,7 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(x_train, y_train), 1):
     X_tr_s = scaler_fold.transform(X_tr)
     X_val_s = scaler_fold.transform(X_val)
 
-    # Build the ANN model (same architecture as original)
+    # Build the ANN model
     fold_model = Sequential()
     fold_model.add(Dense(16, activation='sigmoid', input_shape=[X_tr_s.shape[1]],
                          kernel_regularizer=CustomRegularizer(strength=0.2)))
@@ -100,7 +96,6 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(x_train, y_train), 1):
 
     print(f"Fold {fold}: MAE={mae_f:.4f}, RMSE={rmse_f:.4f}, R2={r2_f:.4f}")
 
-    # Clean session to free memory before next fold
     tf.keras.backend.clear_session()
 
 # Report CV summary
@@ -109,7 +104,7 @@ print(f"MAE:  mean={np.mean(cv_mae):.4f}, std={np.std(cv_mae):.4f}")
 print(f"RMSE: mean={np.mean(cv_rmse):.4f}, std={np.std(cv_rmse):.4f}")
 print(f"R2:   mean={np.mean(cv_r2):.4f}, std={np.std(cv_r2):.4f}")
 
-# ------------ Train final model on full training set (same architecture) ----------
+# Train final model on full training set
 # Fit scaler on full training set
 scaler = StandardScaler().fit(x_train.values)
 x_train_scaled = scaler.transform(x_train.values)
@@ -136,7 +131,7 @@ history = model.fit(x_train_scaled, y_train, epochs=200, batch_size=10,
 #model.save('coolingKfold2.h5')
 #joblib.dump(scaler, 'scaler_thermal.pkl')
 
-# Evaluation (same as before)
+# Evaluation
 y_train_hat = model.predict(x_train_scaled, verbose=0).flatten()
 y_test_hat = model.predict(x_test_scaled, verbose=0).flatten()
 
@@ -154,7 +149,6 @@ mae_test = mean_absolute_error(y_train,y_train_hat)
 print(f"MAE_train: {mae_train:.4f}")
 print(f"MAE_test: {mae_test:.4f}")
 
-# ------------------ rest of your code unchanged (prediction loop, plotting) ------------------
 "------------------------------------------------------------------------"
 r_wall = 1.5
 u_glass = 2.665
