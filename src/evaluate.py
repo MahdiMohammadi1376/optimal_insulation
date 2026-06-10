@@ -1,24 +1,8 @@
-"""
-evaluate.py
------------
-Core objective-function evaluation: given an insulation thickness and material
-ID, returns the Life Cycle Cost (LCC) and Life Cycle CO₂ (LCCO₂) together
-with the building's annual heating and cooling loads.
-
-Results are cached to disk so repeated evaluations of the same (thickness,
-material) pair are instant.
-"""
-
 import os
 import pickle
 import numpy as np
-
 from src.config import MATERIALS, EF_GAS, EF_ELEC, CACHE_FILE, RESULT_DIR
 
-
-# ---------------------------------------------------------------------------
-# Cache helpers
-# ---------------------------------------------------------------------------
 def load_cache() -> dict:
     """Load the evaluation cache from disk, or return an empty dict."""
     if os.path.exists(CACHE_FILE):
@@ -39,10 +23,7 @@ def save_cache(cache: dict) -> None:
     except OSError:
         pass
 
-
-# ---------------------------------------------------------------------------
 # Objective function
-# ---------------------------------------------------------------------------
 def evaluate_solution(
     x: np.ndarray,
     *,
@@ -90,17 +71,16 @@ def evaluate_solution(
         return PENALTY, (0.0, 0.0)
 
     mat = MATERIALS[mat_id]
-    r_insulation = 0.01 / mat["lambda"]          # R per cm of insulation
+    r_insulation = 0.01 / mat["lambda"]   # R per cm of insulation
     cost_per_cm_m2 = (
         mat["cost"] if material_choice == 0 else price_insulation_square_meter
     )
 
-    # --- Cache lookup ---
     key = (round(thickness, 4), mat_id)
     if key in cache:
         return cache[key]
 
-    # --- ANN prediction ---
+    # ANN prediction 
     effective_r_wall = r_wall + thickness * r_insulation
     x_input = np.array([[
         effective_r_wall,
@@ -114,7 +94,7 @@ def evaluate_solution(
     cool_load = float(cool_coef * cool_model.predict(x_scaled, verbose=0).item())
     heat_load = float(heat_coef * heat_model.predict(x_scaled, verbose=0).item())
 
-    # --- Energy breakdown (kWh/year) ---
+    # Energy breakdown (kWh/year)
     gas_cool = elec_cool = gas_heat = elec_heat = 0.0
     if cooling_fuel_type == "gas":
         gas_cool  = 1_000 * cool_load / copc
@@ -126,7 +106,7 @@ def evaluate_solution(
     else:
         elec_heat = 1_000 * heat_load / coph
 
-    # --- Life Cycle Cost ---
+    # Life Cycle Cost
     insulation_cost = thickness * cost_per_cm_m2 * A55
     op_cost = (
         (gas_cool + gas_heat)   * price_gas  * useful_life
@@ -134,7 +114,7 @@ def evaluate_solution(
     )
     lcc = insulation_cost + op_cost
 
-    # --- Life Cycle CO₂ ---
+    # Life Cycle CO2
     volume_m3    = thickness * 0.01 * A55
     embodied_co2 = volume_m3 * mat["density"] * mat["co2_ef"]
     eol_co2      = embodied_co2 * 0.10
